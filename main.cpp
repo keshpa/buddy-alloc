@@ -118,20 +118,28 @@ class bitBuddy {
         bool getFirstZeroBitFromLeft(int32_t &pos) {
             int32_t level = levels;
             pos = 0;
+            int32_t superPos = 0;
 
             if (getBitAtLevel(pos, level)) {
+                pos = -1;
                 return false;
             } else {
                 while (level) {
                     --level;
-                    if (getBitAtLevel(pos*2, level)) {
+                    if (!getBitAtLevel(pos*2, level)) {
+                        // left child is not set
+                        superPos = (superPos*2) + 1;
                         pos *= 2;
                     } else {
-                        assert(getBitAtLevel(pos*2+1, level) == true);
-                        pos = pos*2 +1;
+                        // right child is not set
+                        assert(getBitAtLevel(pos*2+1, level) == false);
+                        pos = (pos*2) + 1;
+                        superPos = (superPos*2) + 2;
                     }
                 }
             }
+            
+            pos = superPos; // return by argument
             return true;
         }
         bool resetBit(int32_t pos) {
@@ -277,15 +285,23 @@ int main() {
     std::cout << ((bb.setBit(5) == true) ? "Success" : "Failure") << std::endl;
     //std::cout << "Set bit 5" << std::endl;
     bb.print();
+    int32_t pos = 0;
+    bb.getFirstZeroBitFromLeft(pos);
+    assert(pos == 13);
+    
 
     std::cout << "Resetting bit 2 ";
     std::cout << ((bb.resetBit(2) == true) ? "Success" : "Failure") << std::endl;
     //std::cout << "Reset bit 2" << std::endl;
     bb.print();
+    bb.getFirstZeroBitFromLeft(pos);
+    assert(pos == 9);
     std::cout << "Resetting bit 1 ";
     std::cout << ((bb.resetBit(1) == true) ? "Success" : "Failure") << std::endl;
     //std::cout << "Reset bit 1" << std::endl;
     bb.print();
+    bb.getFirstZeroBitFromLeft(pos);
+    assert(pos == 8);
 
 
     uint32_t leafSize = 67;
