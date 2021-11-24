@@ -107,8 +107,10 @@ class bitBuddy {
             if (pos > bitsAtLevel) {
                 return false;
             }
-            int32_t levelBitOffset = byteAdjLeafSize*8 + ((1 << levels) - 1) - ((1 << level) - 1);
-            if (getBit(levelBitOffset+pos)) {
+            //int32_t levelBitOffset = byteAdjLeafSize*8 + ((1 << levels) - 1) - ((1 << level) - 1);
+            int32_t levelBitOffset = byteAdjLeafSize*8 + (1 << (levels)) - (1 << (levels - level + 1));
+            int32_t bitValue = 1 << ((pos+levelBitOffset) % 8);
+            if (bitBuddyMap[(levelBitOffset+pos)/8] & bitValue) {
                 return true;
             }
             return false;
@@ -147,6 +149,31 @@ class bitBuddy {
                 }
                 return true;
             }
+        }
+        void printLeafWGet() {
+            std::cout << "Bits on level " << 0 << ": " << numLeafBits << " equating to " << byteAdjLeafSize << " bytes " << std::endl;
+            for (int32_t i = 0; i < numLeafBits; ++i) {
+                if (i && (i % 8 == 0)) {
+                    std::cout << " ";
+                }
+                std::cout << getBit(i);
+            }
+            std::cout << std::endl;
+            printLevelWGet(1);
+        }
+        void printLevelWGet(int32_t level) {
+            int32_t bits = (1 << (levels - level)); // number of bits in this level
+            for (int32_t i = 0; i < bits; ++i) {
+                if (i && (i % 8 == 0)) {
+                    std::cout << " ";
+                }
+                std::cout << getBitAtLevel(i, level);
+            }
+            std::cout << std::endl;
+            if (level == levels) {
+                return;
+            }
+            printLevelWGet(level + 1);
         }
         void print() {
             std::cout << "Bits on level " << 0 << ": " << numLeafBits << " equating to " << byteAdjLeafSize << " bytes " << std::endl;
@@ -226,37 +253,37 @@ class bitBuddy {
 int main() {
     bitBuddy bb(6);
     bb.print();
-    //std::cout << "Setting bit 0 ";
-    //std::cout << ((bb.setBit(0) == true) ? "Success" : "Failure") << std::endl;
+    std::cout << "Setting bit 0 ";
+    std::cout << ((bb.setBit(0) == true) ? "Success" : "Failure") << std::endl;
     //std::cout << "Set bit 0" << std::endl;
     bb.print();
-    //std::cout << "Setting bit 1 ";
-    //std::cout << ((bb.setBit(1) == true) ? "Success" : "Failure") << std::endl;
+    std::cout << "Setting bit 1 ";
+    std::cout << ((bb.setBit(1) == true) ? "Success" : "Failure") << std::endl;
     //std::cout << "Set bit 1" << std::endl;
     bb.print();
-    //std::cout << "Setting bit 2 ";
-    //std::cout << ((bb.setBit(2) == true) ? "Success" : "Failure") << std::endl;
+    std::cout << "Setting bit 2 ";
+    std::cout << ((bb.setBit(2) == true) ? "Success" : "Failure") << std::endl;
     //std::cout << "Set bit 2" << std::endl;
     bb.print();
-    //std::cout << "Setting bit 3 ";
-    //std::cout << ((bb.setBit(3) == true) ? "Success" : "Failure") << std::endl;
+    std::cout << "Setting bit 3 ";
+    std::cout << ((bb.setBit(3) == true) ? "Success" : "Failure") << std::endl;
     //std::cout << "Set bit 3" << std::endl;
     bb.print();
-    //std::cout << "Setting bit 4 ";
-    //std::cout << ((bb.setBit(4) == true) ? "Success" : "Failure") << std::endl;
+    std::cout << "Setting bit 4 ";
+    std::cout << ((bb.setBit(4) == true) ? "Success" : "Failure") << std::endl;
     //std::cout << "Set bit 4" << std::endl;
     bb.print();
-    //std::cout << "Setting bit 5 ";
-    //std::cout << ((bb.setBit(5) == true) ? "Success" : "Failure") << std::endl;
+    std::cout << "Setting bit 5 ";
+    std::cout << ((bb.setBit(5) == true) ? "Success" : "Failure") << std::endl;
     //std::cout << "Set bit 5" << std::endl;
     bb.print();
 
-    //std::cout << "Resetting bit 2 ";
-    //std::cout << ((bb.resetBit(2) == true) ? "Success" : "Failure") << std::endl;
+    std::cout << "Resetting bit 2 ";
+    std::cout << ((bb.resetBit(2) == true) ? "Success" : "Failure") << std::endl;
     //std::cout << "Reset bit 2" << std::endl;
     bb.print();
-    //std::cout << "Resetting bit 1 ";
-    //std::cout << ((bb.resetBit(1) == true) ? "Success" : "Failure") << std::endl;
+    std::cout << "Resetting bit 1 ";
+    std::cout << ((bb.resetBit(1) == true) ? "Success" : "Failure") << std::endl;
     //std::cout << "Reset bit 1" << std::endl;
     bb.print();
 
@@ -272,6 +299,8 @@ int main() {
         test.resetBit(rand() % leafSize);
     } 
     test.print();
+    
+    
 
     return 0;
 }
